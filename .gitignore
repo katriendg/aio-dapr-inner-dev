@@ -396,3 +396,11 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# Temp working files
+.env
+/temp/*
+
+# AIO generated cert stuff
+*.crt
+*.key
