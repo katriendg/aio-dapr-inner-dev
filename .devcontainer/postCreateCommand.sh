@@ -15,7 +15,7 @@ az extension add --name azure-iot-ops
 export K3D_FIX_MOUNTS=1
 
 # Create local registry for K3D and local development
-k3d registry create devregistry.localhost --port 5500
+k3d registry create k3d-devregistry.localhost --port 5500
 
 # Create k3d cluster with NFS support and forwarded ports
 # See https://github.com/jlian/k3d-nfs
