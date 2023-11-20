@@ -28,7 +28,7 @@ Param(
 
 Write-Host "Pre-requisite - Key Vault"
 
-# az keyvault create -n $KeyVaultName -g $ResourceGroupName
+az keyvault create -n $KeyVaultName -g $ResourceGroupName
 
 $keyVaultResourceId = $(az keyvault show -n $KeyVaultName -g $ResourceGroupName -o tsv --query id)
 
@@ -36,7 +36,7 @@ Write-Host "Preparing AIO with CLI --no-deploy"
 
 # Configure the Key Vault Extension on the Arc enabled cluster, configure App Registration and permissions
 
-# az iot ops init --cluster $ClusterName -g $ResourceGroupName --kv-id $keyVaultResourceId --no-deploy
+az iot ops init --cluster $ClusterName -g $ResourceGroupName --kv-id $keyVaultResourceId --no-deploy
 
 Write-Host "Deploying AIO components with ARM template"
 
