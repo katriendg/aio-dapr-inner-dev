@@ -20,7 +20,7 @@ Param(
 
 Write-Host "Pre-requisite - Key Vault"
 
-# az keyvault create -n $KeyVaultName -g $ResourceGroupName -o tsv --query id
+az keyvault create -n $KeyVaultName -g $ResourceGroupName -o tsv --query id
 
 $keyVaultResourceId = $(az keyvault show -n $KeyVaultName -g $ResourceGroupName -o tsv --query id)
 
@@ -31,8 +31,7 @@ Write-Host "Deploying AIO components"
 az iot ops init --cluster $ClusterName -g $ResourceGroupName --kv-id $keyVaultResourceId `
   --mq-mode auto --simulate-plc
 
-# Setup an anonymous listener for MQTT 
-
+# Setup a NON TLS anonymous listener for MQTT broker - do not use in production, for dev purposes only
 kubectl apply -f ./devsetup/yaml/mq-listener-non-tls.yaml
 
 # Currently using the azure-iot-operations namespace as the default selection - simplifies some config

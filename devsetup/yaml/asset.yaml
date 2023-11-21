@@ -9,11 +9,11 @@ spec:
   displayName: Thermostat sample asset
   description: A sample thermostat
   assetType: thermostat
-  assetEndpointProfileUri: opc-ua-connector
+  assetEndpointProfileUri: aio-opcplc-connector
   defaultDataPointsConfiguration: |-
     {
       "publishingInterval": 200,
-      "samplingInterval": 500,
+      "samplingInterval": 1000,
       "queueSize": 10
     }    
   dataPoints:
@@ -22,7 +22,7 @@ spec:
       observabilityMode: log
       dataPointConfiguration: |-
         {
-          "samplingInterval": 500,
+          "samplingInterval": 5000,
           "queueSize": 15
         }        
     - dataSource: nsu=http://microsoft.com/Opc/OpcPlc/;s=FastUInt2

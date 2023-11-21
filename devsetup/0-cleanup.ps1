@@ -17,7 +17,7 @@ az group delete --name $ResourceGroupName
 
 Write-Host "Azure resources deleted"
 
-k3d registry delete devregistry.localhost 
+k3d registry delete k3d-devregistry.localhost 
 k3d cluster delete devcluster
 
 Write-Host "K3D registry and cluster deleted"

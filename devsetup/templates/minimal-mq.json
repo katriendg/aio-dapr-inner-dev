@@ -150,8 +150,8 @@
       },
       "MQ_PROPERTIES": {
         "domain": "[format('aio-mq-dmqtt-frontend.{0}', variables('AIO_CLUSTER_RELEASE_NAMESPACE'))]",
-        "port": 1883,
-        "localUrl": "[format('mqtts://aio-mq-dmqtt-frontend.{0}:1883', variables('AIO_CLUSTER_RELEASE_NAMESPACE'))]",
+        "port": 8883,
+        "localUrl": "[format('mqtts://aio-mq-dmqtt-frontend.{0}:8883', variables('AIO_CLUSTER_RELEASE_NAMESPACE'))]",
         "name": "aio-mq-dmqtt-frontend",
         "satAudience": "aio-mq"
       },

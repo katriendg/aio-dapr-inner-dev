@@ -22,7 +22,7 @@ Param(
 
   [string]
   [Parameter(mandatory = $False)]
-  $ParametersFile = "minimal1.parameters.json"
+  $ParametersFile = "minimal-mq-opc.parameters.json"
 
 )
 
@@ -33,14 +33,12 @@ az keyvault create -n $KeyVaultName -g $ResourceGroupName
 $keyVaultResourceId = $(az keyvault show -n $KeyVaultName -g $ResourceGroupName -o tsv --query id)
 
 Write-Host "Preparing AIO with CLI --no-deploy"
-
 # Configure the Key Vault Extension on the Arc enabled cluster, configure App Registration and permissions
 
 az iot ops init --cluster $ClusterName -g $ResourceGroupName --kv-id $keyVaultResourceId --no-deploy
 
 Write-Host "Deploying AIO components with ARM template"
 
-# Deploy AIO through the template
 $random = Get-Random -Minimum 1000 -Maximum 9999
 $deploymentName = "aio-deployment-$random"
 
@@ -49,19 +47,21 @@ az deployment group create `
 --name aio-deployment-$deploymentName `
 --template-file "$PSScriptRoot/templates/$TemplateFile" `
 --parameters "$PSScriptRoot/environments/$ParametersFile" `
+--parameters clusterName=$ClusterName `
 --verbose --no-prompt
 
 # TODO observability base chart via Helm
-
 
 # Currently using the azure-iot-operations namespace as the default selection - simplifies some config
 kubectl config set-context --current --namespace=azure-iot-operations
 
 # Deploy MQ Broker, Listener and Diagnostics
-Write-Host "Deploying MQTT Broker and Listener"
+Write-Host "Deploying MQTT Broker and TLS enabled Listener, and non-TLS Listener for dev purposes"
+kubectl apply -f $PSScriptRoot/yaml/mq-cert-issuer.yaml
 kubectl apply -f $PSScriptRoot/yaml/minimal-mq-broker.yaml
+kubectl apply -f $PSScriptRoot/yaml/mq-listener-non-tls.yaml
 
-# Deploy OPC UA Broker with Helm # TODO
+# Deploy OPC UA Broker with Helm 
 Write-Host "Deploying OPC UA components"
 
 helm upgrade -i opcuabroker oci://mcr.microsoft.com/azureiotoperations/opcuabroker/helmchart/microsoft.iotoperations.opcuabroker `
@@ -70,16 +70,22 @@ helm upgrade -i opcuabroker oci://mcr.microsoft.com/azureiotoperations/opcuabrok
     --namespace azure-iot-operations    `
     --create-namespace     `
     --set secrets.kind=k8s     `
-    --set mqttBroker.address=mqtt://aio-mq-dmqtt-frontend:1883     `
+    --set secrets.csiServicePrincipalSecretRef=aio-akv-sp `
+    --set secrets.csiDriver:=secrets-store.csi.k8s.io `
+    --set mqttBroker.address=mqtts://aio-mq-dmqtt-frontend.azure-iot-operations:8883     `
+    --set mqttBroker.authenticationMethod=serviceAccountToken `
+    --set mqttBroker.serviceAccountTokenAudience=aio-mq     `
+    --set mqttBroker.caCertConfigMapRef='aio-ca-trust-bundle-test-only'     `
+    --set mqttBroker.caCertKey=ca.crt `
     --set connectUserProperties.metriccategory=aio-opc     `
     --set opcPlcSimulation.deploy=true     `
     --wait
 
-# TODO upgrade Helm chart to Preview  - WIP this does not seem to work fully yet
+# TODO upgrade Helm chart to Preview or change to usage of CR create via Yaml (AssetEndpointProfile)
 helm upgrade -i aio-opcplc-connector oci://mcr.microsoft.com/opcuabroker/helmchart/aio-opc-opcua-connector `
-    --version 0.1.0-preview.5 `
+    --version 0.1.0-preview.6 `
     --namespace azure-iot-operations `
-    --set opcUaConnector.settings.discoveryUrl="opc.tcp://opcplc-000000.opcuabroker:50000" `
+    --set opcUaConnector.settings.discoveryUrl="opc.tcp://opcplc-000000:50000" `
     --set opcUaConnector.settings.autoAcceptUntrustedCertificates=true `
     --wait
 
@@ -87,4 +93,4 @@ helm upgrade -i aio-opcplc-connector oci://mcr.microsoft.com/opcuabroker/helmcha
 kubectl apply -f $PSScriptRoot/yaml/assettypes.yaml
 kubectl apply -f $PSScriptRoot/yaml/asset.yaml
 
-Write-Host "AIO components deployed in Azure and on the K3D cluster in the dev container"
+Write-Host "Key Vault, AIO MQ and OPC Broker deployed in Azure and connected K3D cluster"

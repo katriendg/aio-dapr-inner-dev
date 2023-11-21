@@ -83,32 +83,38 @@ Several scripts allow you to automate the process, all of which can be found in 
 6. Choose the Run and Debug icon in the VS Code left bar ![img](./docs/images/debugwithk8s.png)
 7. Start debugging (F5). Bridge to Kubernetes will start up and forward traffic from the cluster to your local debug session.
 
-### Debugging flow with messages
+### Debugging Flow with AIO MQTT Broker Messages
 
 1. Ensure debug session is still active. Add a new breakpoint in the file `src/csharp/SamplePubSub/Controllers/MessagesTransformerController.cs`, under the function `MessageReceived` so you can debug messages coming in.
-1. Go to your Terminal and start a new terminal window using bash or PowerShell as preferred.
-1. Run MQTTUI to view messages on the MQ: `mqttui`. This command will connect to the default MQTT server at `localhost` port `1883` which is being forwarded from the cluster to your Dev Container. Leave this terminal window running. If you need to manually forward the traffic run the following in yet another terminal: `kubectl port-forward svc/aio-mq-dmqtt-frontend 1883:1883`.
+1. Start a new terminal window using bash or PowerShell as preferred.
+1. Run MQTTUI to view messages on the MQ: `mqttui`. This command will connect to the default MQTT server at `localhost` port `1883` which is being forwarded from the cluster to your Dev Container. Leave this terminal window running. If you need to manually forward the traffic run the following in yet another terminal: `kubectl port-forward svc/aio-mq-dmqtt-frontend 1883:1883`. Leave this one running.
 1. Open yet another Terminal window.
 1. Publish a message to the MQ: `mqttui publish "messages" '{"content":"Hello world","tag":"this is 1"}'`.
-1. You should now enter debug console and you can debug as desired based on breakpoints.
+1. You should now enter debug console and you can debug as desired based on breakpoints in your code.
 1. After debugging through the function, go back to your Terminal window where `mqttui` is running and you should see the original message as well as a copy of the message under the topic `outmessages`.
 1. Stop debugging and Bridge to Kubernetes will reset the environment so that your application is again running in the cluster.
 
-### Update application and deploy new version to debug
+### Update Application and Deploy New Version to Debug
 
-When you want to do code changes, chances are you don't need to deploy a new version of the container to debug live. Simply stop debugging session, do your code changes and start debugging session again as described above. Because the traffic is redirected to your own code on the machine, new code changes should be reflected and you can increase your developer speed.
+When you want to do code changes, chances are you don't need to build and deploy a new version of the container to debug. Simply stop debugging session, do your code changes and start debugging session again as described above. Because the traffic is redirected to your own code on the machine, new code changes should be reflected and you can increase your developer speed. This works regardless of the actual version of the container deployed to the cluster.
 
-There might however be cases when you do want to deploy your new code changes to the cluster, and then debug from there. For this, you can use the script `src/csharp/deploydebug/cleanup.ps1` to remove the deployment from the cluster.
+There might however be cases when you do need to deploy new Pod configuration and new code changes to the cluster, and then debug from again with changes reflected. For this, you can use the script `src/csharp/deploydebug/cleanup.ps1` to remove the deployment from the cluster.
 
 ```powershell
 ./src/csharp/deploydebug/cleanup.ps1 -Version 0.1
 ```
 
 After the application has been removed from the cluster simply rerun the scripts to build the Docker images and deploy to the cluster as described in the section Building, deploying and debugging the application above, and increase the `Version` parameter.
-<!-- 
-## Clean-up environment and Reset
 
-Whenever you want to start again with a new K3D registry, cluster, Azure Arc and AIO components in both Azure and local cluster, you can run the script `devsetup/0-cleanup.ps1` to clean everything (TODO). -->
+## Clean-up environment and Reset Dev Container
+
+Whenever you want to start again with a new K3D registry, cluster, Azure Arc and AIO components in both Azure and local cluster, you can run the PowerShell script `devsetup/0-cleanup.ps1`.
+
+```powershell
+./devsetup/0-cleanup.ps1 -ResourceGroupName rg-MY-RG
+```
+
+This deletes all Azure resources (resource group, Azure Arc, Key Vault). It also deletes the K3D container registry and cluster, and then re-creates the registry and K3D cluster once again.
 
 ## Option to Leverage this Sample without Dev Container
 

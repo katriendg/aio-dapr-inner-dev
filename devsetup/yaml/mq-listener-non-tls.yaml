@@ -4,7 +4,8 @@ metadata:
   name: az-mqtt-non-tls-listener
   namespace: azure-iot-operations
 spec:
-  brokerRef: broker
+  brokerRef: mq-instance-broker
   authenticationEnabled: false
   authorizationEnabled: false
   port: 1883
+  serviceType: loadBalancer

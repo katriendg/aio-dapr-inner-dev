@@ -1,7 +1,7 @@
 apiVersion: mq.iotoperations.azure.com/v1beta1
 kind: Broker
 metadata:
-  name: broker
+  name: mq-instance-broker
   namespace: azure-iot-operations
 spec:
   authImage:
@@ -28,7 +28,7 @@ spec:
       workers: 2
   encryptInternalTraffic: false
   diagnostics:
-    diagnosticServiceEndpoint: diagnosticservices.mq.iotoperations:9700
+    diagnosticServiceEndpoint: mq-instance-diagnostics-service.azure-iot-operations:9700
     enableMetrics: true  
     enableTracing: true
     enableSelfCheck: true
@@ -39,11 +39,11 @@ spec:
 apiVersion: mq.iotoperations.azure.com/v1beta1
 kind: DiagnosticService
 metadata:
-  name: "broker"
+  name: mq-instance-diagnostics-service
   namespace: azure-iot-operations
 spec:
   image:
-    repository: mcr.microsoft.com/azureiotoperations/diagnostics-service
+    repository: mcr.microsoft.com/azureiotoperations/diagnostics-service #TODO verify this is correct
     tag: 0.1.0-preview
   logLevel: info
   logFormat: text
@@ -51,18 +51,18 @@ spec:
 apiVersion: mq.iotoperations.azure.com/v1beta1
 kind: BrokerListener
 metadata:
-  name: listener
+  name: mq-tls-listener
   namespace: azure-iot-operations
 spec:
-  brokerRef: broker
+  brokerRef: mq-instance-broker
   authenticationEnabled: false
   authorizationEnabled: false
-  port: 1883
+  port: 8883
   serviceName: aio-mq-dmqtt-frontend
   serviceType: loadBalancer
-  # tls:
-  #   automatic:
-  #     issuerRef:
-  #       group: cert-manager.io
-  #       kind: Issuer
-  #       name: mq-dmqtt-frontend
+  tls:
+    automatic:
+      issuerRef:
+        group: cert-manager.io
+        kind: Issuer
+        name: mq-dmqtt-frontend
