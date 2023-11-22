@@ -41,4 +41,4 @@ $arcObjectId = $(az ad sp show --id bc313c14-388c-4e7d-a58e-70017303ee3b --query
 
 az connectedk8s enable-features -n $ClusterName -g $ResourceGroupName --custom-locations-oid $arcObjectId --features cluster-connect custom-locations
 
-Write-Host "Resource Group '$ResourceGroupName' created and K3S Cluster named '$ClusterName' connected to Azure Arc"
+Write-Host "Resource Group '$ResourceGroupName' created and K3S Cluster named '$ClusterName' connected to Azure Arc"  -ForegroundColor DarkGreen

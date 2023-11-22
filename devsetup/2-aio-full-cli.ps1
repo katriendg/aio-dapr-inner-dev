@@ -37,4 +37,4 @@ kubectl apply -f ./devsetup/yaml/mq-listener-non-tls.yaml
 # Currently using the azure-iot-operations namespace as the default selection - simplifies some config
 kubectl config set-context --current --namespace=azure-iot-operations
 
-Write-Host "AIO components deployed in Azure and on the K3D cluster in the dev container"
+Write-Host "AIO components deployed in Azure and on the K3D cluster in the dev container"  -ForegroundColor DarkGreen

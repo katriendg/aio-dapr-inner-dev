@@ -22,7 +22,7 @@ Param(
 
 )
 
-Write-Host "Deploying AIO components with ARM template"
+Write-Host "Deploying AIO components with ARM template - $TemplateFile"
 
 $random = Get-Random -Minimum 1000 -Maximum 9999
 $deploymentName = "aio-deployment-$random"
@@ -38,7 +38,8 @@ az deployment group create `
 
 # TODO observability base chart via Helm
 
-# Currently using the azure-iot-operations namespace as the default selection - simplifies some config
+# Currently using the azure-iot-operations namespace as the default context - simplifies some config
+Write-Host "Setting default namespace to azure-iot-operations"  -ForegroundColor DarkGreen
 kubectl config set-context --current --namespace=azure-iot-operations
 
 # Deploy MQ Broker, Listener and Diagnostics
@@ -71,4 +72,4 @@ helm upgrade -i aio-opcplc-connector oci://mcr.microsoft.com/opcuabroker/helmcha
 kubectl apply -f $PSScriptRoot/yaml/assettypes.yaml
 kubectl apply -f $PSScriptRoot/yaml/asset.yaml
 
-Write-Host "Finished - AIO, MQ and OPC Broker deployed in Azure and connected K3D cluster"
+Write-Host "Finished - AIO, MQ and OPC Broker deployed in Azure and connected K3D cluster" -ForegroundColor DarkGreen
