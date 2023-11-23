@@ -124,7 +124,7 @@ On the K3D cluster:
 
 ```powershell
 # Pass an exta argument -Location if you want something else than northeurope
-./devsetup/2-aio-insecure-mq-opc.ps1 -ClusterName arck-MY-CLUSTER -ResourceGroupName rg-MY-RG
+./devsetup/2-aio-nontls-mq-opc.ps1 -ClusterName arck-MY-CLUSTER -ResourceGroupName rg-MY-RG
 ```
 
 - Validate components are deployed by reviewing the pods. This can take a few minutes.

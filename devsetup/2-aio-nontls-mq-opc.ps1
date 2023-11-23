@@ -14,7 +14,7 @@ Param(
 
   [string]
   [Parameter(mandatory = $False)]
-  $TemplateFile = "insecure-mq.json",
+  $TemplateFile = "minimal-nontls-mq.json",
 
   [string]
   [Parameter(mandatory = $False)]
