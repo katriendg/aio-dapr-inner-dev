@@ -9,8 +9,8 @@ Param(
   $ResourceGroupName,
 
   [string]
-  [Parameter(mandatory = $False)]
-  $ClusterName = "arck-aio-dev",
+  [Parameter(mandatory = $True)]
+  $ClusterName,
 
   [string]
   [Parameter(mandatory = $True)]
@@ -26,13 +26,11 @@ $keyVaultResourceId = $(az keyvault show -n $KeyVaultName -g $ResourceGroupName 
 
 Write-Host "Deploying AIO components"
 
-# TODO change this to ARM template deployment with minimal chosen components
-
 az iot ops init --cluster $ClusterName -g $ResourceGroupName --kv-id $keyVaultResourceId `
   --mq-mode auto --simulate-plc
 
 # Setup a NON TLS anonymous listener for MQTT broker - do not use in production, for dev purposes only
-kubectl apply -f ./devsetup/yaml/mq-listener-non-tls.yaml
+kubectl apply -f $PSScriptRoot/yaml/mq-listener-non-tls.yaml
 
 # Currently using the azure-iot-operations namespace as the default selection - simplifies some config
 kubectl config set-context --current --namespace=azure-iot-operations

@@ -41,11 +41,10 @@ On the K3D cluster:
 
 ```
 
-- Make a copy of the `./devsetup/environments/example.minimal-mq-opc.parameters.json` file and name it `minimal-mq-opc.parameters.json` in the same `./devsetup/environments` folder.
-- In a PowerShell terminal run the following script, ensuring the Azure Key Vault named passed in will be unique enough:
+- In a PowerShell terminal run the following script, passing in the same Resource Group and ClusterName as used above, ensuring the Azure Key Vault named passed in will be unique enough:
 
 ```powershell
-./devsetup/2-aio-minimal-mq-opc.ps1 -ClusterName arck-MY-CLUSTER -ResourceGroupName rg-MY-RG -KeyVaultName kv-MY-KEYVAULTNAME
+./devsetup/2-aio-minimal-mq-opc.ps1 -ClusterName arck-MY-CLUSTER -ResourceGroupName rg-MY-RG -KeyVaultName kv-MY-KEYVAULTNAME  -Location northeurope
 ```
 
 - Validate components are deployed by reviewing the pods. This can take a few minutes.
@@ -125,6 +124,7 @@ On the K3D cluster:
 ```powershell
 # Pass an exta argument -Location if you want something else than northeurope
 ./devsetup/2-aio-nontls-mq-opc.ps1 -ClusterName arck-MY-CLUSTER -ResourceGroupName rg-MY-RG
+
 ```
 
 - Validate components are deployed by reviewing the pods. This can take a few minutes.

@@ -9,8 +9,8 @@ Param(
   $ResourceGroupName,
 
   [string]
-  [Parameter(mandatory = $False)]
-  $ClusterName = "arck-aio-dev",
+  [Parameter(mandatory = $True)]
+  $ClusterName,
 
   [string]
   [Parameter(mandatory = $True)]
@@ -22,7 +22,7 @@ Param(
 
   [string]
   [Parameter(mandatory = $False)]
-  $ParametersFile = "minimal-mq-opc.parameters.json"
+  $Location = "northeurope"
 
 )
 
@@ -46,8 +46,9 @@ az deployment group create `
 --resource-group $ResourceGroupName `
 --name aio-deployment-$deploymentName `
 --template-file "$PSScriptRoot/templates/$TemplateFile" `
---parameters "$PSScriptRoot/environments/$ParametersFile" `
 --parameters clusterName=$ClusterName `
+--parameters location=$Location `
+--parameters clusterLocation=$Location `
 --verbose --no-prompt
 
 # TODO observability base chart via Helm

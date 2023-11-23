@@ -4,8 +4,11 @@ metadata:
   name: az-mqtt-non-tls-listener
   namespace: azure-iot-operations
 spec:
-  brokerRef: mq-instance-broker
+  brokerRef: broker
   authenticationEnabled: false
   authorizationEnabled: false
   port: 1883
   serviceType: loadBalancer
+  # needs to be a different service name because default Listener is clusterIp
+  # see https://learn.microsoft.com/en-us/azure/iot-operations/manage-mqtt-connectivity/howto-configure-brokerlistener#service-name-and-service-type
+  serviceName: aio-mq-custom-svc # for developer local machine forwarding

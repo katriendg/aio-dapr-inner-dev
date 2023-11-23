@@ -87,7 +87,7 @@ Several scripts allow you to automate the process, all of which can be found in 
 
 1. Ensure debug session is still active. Add a new breakpoint in the file `src/csharp/SamplePubSub/Controllers/MessagesTransformerController.cs`, under the function `MessageReceived` so you can debug messages coming in.
 1. Start a new terminal window using bash or PowerShell as preferred.
-1. Run MQTTUI to view messages on the MQ: `mqttui`. This command will connect to the default MQTT server at `localhost` port `1883` which is being forwarded from the cluster to your Dev Container. Leave this terminal window running. If you need to manually forward the traffic run the following in yet another terminal: `kubectl port-forward svc/aio-mq-dmqtt-frontend 1883:1883`. Leave this one running.
+1. Run MQTTUI to view messages on the MQ: `mqttui`. This command will connect to the default MQTT server at `localhost` port `1883` which is being forwarded from the cluster to your Dev Container. Leave this terminal window running.
 1. Open yet another Terminal window.
 1. Publish a message to the MQ: `mqttui publish "messages" '{"content":"Hello world","tag":"this is 1"}'`.
 1. You should now enter debug console and you can debug as desired based on breakpoints in your code.

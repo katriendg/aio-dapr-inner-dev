@@ -66,3 +66,15 @@ spec:
         group: cert-manager.io
         kind: Issuer
         name: mq-dmqtt-frontend
+---
+apiVersion: mq.iotoperations.azure.com/v1beta1
+kind: BrokerListener
+metadata:
+  name: az-mqtt-non-tls-listener
+  namespace: azure-iot-operations
+spec:
+  brokerRef: mq-instance-broker
+  authenticationEnabled: false
+  authorizationEnabled: false
+  port: 1883
+  serviceType: loadBalancer
