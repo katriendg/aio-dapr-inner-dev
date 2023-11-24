@@ -72,8 +72,8 @@ helm upgrade -i opcuabroker oci://mcr.microsoft.com/azureiotoperations/opcuabrok
     --create-namespace     `
     --set secrets.kind=k8s     `
     --set secrets.csiServicePrincipalSecretRef=aio-akv-sp `
-    --set secrets.csiDriver:=secrets-store.csi.k8s.io `
-    --set mqttBroker.address=mqtts://aio-mq-dmqtt-frontend.azure-iot-operations:8883     `
+    --set secrets.csiDriver=secrets-store.csi.k8s.io `
+    --set mqttBroker.address=mqtts://aio-mq-dmqtt-frontend.azure-iot-operations.svc.cluster.local:8883     `
     --set mqttBroker.authenticationMethod=serviceAccountToken `
     --set mqttBroker.serviceAccountTokenAudience=aio-mq     `
     --set mqttBroker.caCertConfigMapRef='aio-ca-trust-bundle-test-only'     `
@@ -86,12 +86,14 @@ helm upgrade -i opcuabroker oci://mcr.microsoft.com/azureiotoperations/opcuabrok
 helm upgrade -i aio-opcplc-connector oci://mcr.microsoft.com/opcuabroker/helmchart/aio-opc-opcua-connector `
     --version 0.1.0-preview.6 `
     --namespace azure-iot-operations `
-    --set opcUaConnector.settings.discoveryUrl="opc.tcp://opcplc-000000:50000" `
+    --set opcUaConnector.settings.discoveryUrl="opc.tcp://opcplc-000000.azure-iot-operations.svc.cluster.local:50000" `
     --set opcUaConnector.settings.autoAcceptUntrustedCertificates=true `
     --wait
 
-# Deploy AssetType and Asset instance - WIP this does not seem to work yet - no OPCUA messages in the broker
+# Deploy AssetType and Asset instance
 kubectl apply -f $PSScriptRoot/yaml/assettypes.yaml
 kubectl apply -f $PSScriptRoot/yaml/asset.yaml
+# Deploy an example of unmodelled asset (no AssetType)
+kubectl apply -f $PSScriptRoot/yaml/asset-unmodelled.yaml
 
 Write-Host "Finished - Key Vault, AIO MQ and OPC Broker deployed in Azure and connected K3D cluster"

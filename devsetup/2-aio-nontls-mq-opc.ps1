@@ -64,7 +64,7 @@ helm upgrade -i opcuabroker oci://mcr.microsoft.com/azureiotoperations/opcuabrok
 helm upgrade -i aio-opcplc-connector oci://mcr.microsoft.com/opcuabroker/helmchart/aio-opc-opcua-connector `
     --version 0.1.0-preview.6 `
     --namespace azure-iot-operations `
-    --set opcUaConnector.settings.discoveryUrl="opc.tcp://opcplc-000000:50000" `
+    --set opcUaConnector.settings.discoveryUrl="opc.tcp://opcplc-000000.azure-iot-operations.svc.cluster.local:50000" `
     --set opcUaConnector.settings.autoAcceptUntrustedCertificates=true `
     --wait
 
