@@ -1,8 +1,5 @@
 FROM mcr.microsoft.com/devcontainers/universal:2-linux
 
-# todo check if needed
-# RUN mkdir -p /var/run/secrets/tokens
-
 # Install mosquitto client
 RUN apt-get update && apt-get install mosquitto-clients -y
 

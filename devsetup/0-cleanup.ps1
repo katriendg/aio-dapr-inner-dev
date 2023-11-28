@@ -34,7 +34,8 @@ k3d cluster create devcluster --registry-use k3d-devregistry.localhost:5500 -i g
 -p '6001:6001@loadbalancer' `
 -p '4000:80@loadbalancer'
 
-# TODO - check for cluster readiness before proceeding
+Write-Host "Installing Dapr on cluster" -foregroundcolor DarkGreen
+Start-Sleep -Seconds 15 # wait for cluster to be ready
 
 helm repo add dapr https://dapr.github.io/helm-charts/
 helm repo update

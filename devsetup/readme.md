@@ -79,9 +79,9 @@ aio-opc-opc.tcp-1-6676cfc49f-5dg6n              2/2     Running   0             
 - Once deployment is complete, open a new Terminal and run `mqttui` to watch messages from the OPC UA broker flow through to the MQTT broker. You should see messages under the topic `azure-iot-operations/data/opc.tcp/opc.tcp-1/thermostat-sample`.
 - This concludes the setup of Sample 1.
 
-## Sample 2: Deploying AIO Components MQ, OPC Broker and Sample Asset without TLS and Secrets (for dev only!) - Work in Progress...
+## Sample 2: Deploying AIO Components MQ, OPC Broker and Sample Asset without TLS and Secrets (for dev only!)
 
-This sample aims to deploy and configure AIO in the simplest form possible for trying out in a developer environment.
+This sample aims to deploy and configure AIO in the simplest form possible for trying out in a developer environment. This sample is intended for inner developer loop and should not be used in production.
 
 ### Sample 2: Pre-requisites
 
@@ -97,9 +97,7 @@ On Azure:
 - Azure Resource Group
 - Azure Arc Connected Kubernetes cluster
 - Azure IoT Operations Arc extension
-- AIO MQ Arc extension
-- Azure Arc Custom Location
-- Azure Arc custom location sync rules
+- Azure IoT Operations MQ Arc extension
 
 On the K3D cluster:
 
