@@ -60,7 +60,6 @@ kubectl config set-context --current --namespace=azure-iot-operations
 Write-Host "Deploying MQTT Broker and TLS enabled Listener, and non-TLS Listener for dev purposes"
 kubectl apply -f $PSScriptRoot/yaml/mq-cert-issuer.yaml
 kubectl apply -f $PSScriptRoot/yaml/minimal-mq-broker.yaml
-kubectl apply -f $PSScriptRoot/yaml/mq-listener-non-tls.yaml
 
 # Deploy OPC UA Broker with Helm 
 Write-Host "Deploying OPC UA components"
