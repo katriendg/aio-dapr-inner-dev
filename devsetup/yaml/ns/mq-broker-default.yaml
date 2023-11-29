@@ -1,0 +1,86 @@
+apiVersion: mq.iotoperations.azure.com/v1beta1
+kind: Broker
+metadata:
+  name: mq-instance-broker
+  namespace: azure-iot-operations
+spec:
+  authImage:
+    pullPolicy: Always
+    repository: mcr.microsoft.com/azureiotoperations/dmqtt-authentication
+    tag: 0.1.0-preview
+  brokerImage:
+    pullPolicy: Always
+    repository: mcr.microsoft.com/azureiotoperations/dmqtt-pod
+    tag: 0.1.0-preview
+  healthManagerImage:
+    pullPolicy: Always
+    repository: alicesprings.azurecr.io/dmqtt-operator
+    tag: 0.1.0-preview
+  memoryProfile: medium
+  mode: distributed
+  cardinality:
+    backendChain:
+      partitions: 2
+      redundancyFactor: 2
+      workers: 2
+    frontend:
+      replicas: 2
+      workers: 2
+  encryptInternalTraffic: false
+  diagnostics:
+    diagnosticServiceEndpoint: mq-instance-diagnostics-service.azure-iot-operations:9700
+    enableMetrics: true  
+    enableTracing: true
+    enableSelfCheck: true
+    logLevel: info,hyper=off,kube_client=off,tower=off,conhash=off,h2=off
+  # TODO diskBackedMessageBufferSettings for message buffer behavior - 
+  # see https://learn.microsoft.com/en-us/azure/iot-operations/manage-mqtt-connectivity/howto-configure-availability-scale#configure-disk-backed-message-buffer-behavior
+---
+apiVersion: mq.iotoperations.azure.com/v1beta1
+kind: DiagnosticService
+metadata:
+  name: mq-instance-diagnostics-service
+  namespace: azure-iot-operations
+spec:
+  image:
+    repository: mcr.microsoft.com/azureiotoperations/diagnostics-service #TODO verify this is correct
+    tag: 0.1.0-preview
+  logLevel: info
+  logFormat: text
+---
+apiVersion: mq.iotoperations.azure.com/v1beta1
+kind: BrokerListener
+metadata:
+  name: mq-tls-listener
+  namespace: azure-iot-operations
+spec:
+  brokerRef: mq-instance-broker
+  authenticationEnabled: false
+  authorizationEnabled: false
+  port: 8883
+  serviceName: aio-mq-dmqtt-frontend
+  serviceType: loadBalancer
+  tls:
+    automatic:
+      issuerRef:
+        group: cert-manager.io
+        kind: Issuer
+        name: mq-dmqtt-frontend
+      san:
+        dns:
+        - aio-mq-dmqtt-frontend.azure-iot-operations.svc.cluster.local
+        - aio-mq-dmqtt-frontend.azure-iot-operations
+        ip:
+        - 0.0.0.0
+---
+apiVersion: mq.iotoperations.azure.com/v1beta1
+kind: BrokerListener
+metadata:
+  name: az-mqtt-non-tls-listener
+  namespace: azure-iot-operations
+spec:
+  brokerRef: mq-instance-broker
+  authenticationEnabled: false
+  authorizationEnabled: false
+  port: 1883
+  serviceType: loadBalancer

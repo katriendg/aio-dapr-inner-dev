@@ -51,20 +51,39 @@ az deployment group create `
 --parameters clusterLocation=$Location `
 --verbose --no-prompt
 
-# TODO observability base chart via Helm
-
 # Currently using the azure-iot-operations namespace as the default selection - simplifies some config
 kubectl config set-context --current --namespace=azure-iot-operations
 
+# Deploy reflector to sync configmaps across namespaces
+# https://github.com/emberstack/kubernetes-reflector
+helm repo add emberstack https://emberstack.github.io/helm-charts
+helm repo update
+helm upgrade --install reflector emberstack/reflector
+
+# Create mqtt-client service account in azure-iot-ooerations and default namespaces
+kubectl create sa mqtt-client -n azure-iot-operations
+kubectl create sa mqtt-client -n "default"
+
+# az iot ops INIT done via CLI, configmap with the CA cert is created in azure-iot-operation namespace
+# Annotate the configmap to allow emberstack/reflector to sync across namespaces, and auto-create in `default` namespace
+kubectl annotate configmap aio-ca-trust-bundle-test-only -n azure-iot-operations reflector.v1.k8s.emberstack.com/reflection-allowed='true'
+kubectl annotate configmap aio-ca-trust-bundle-test-only -n azure-iot-operations reflector.v1.k8s.emberstack.com/reflection-auto-enabled='true'
+kubectl annotate configmap aio-ca-trust-bundle-test-only -n azure-iot-operations reflector.v1.k8s.emberstack.com/reflection-auto-namespaces='default'
+
 # Deploy MQ Broker, Listener and Diagnostics
 Write-Host "Deploying MQTT Broker and TLS enabled Listener, and non-TLS Listener for dev purposes"
-kubectl apply -f $PSScriptRoot/yaml/mq-cert-issuer.yaml
-kubectl apply -f $PSScriptRoot/yaml/minimal-mq-broker.yaml
+kubectl apply -f $PSScriptRoot/yaml/ns/mq-cert-issuer.yaml
+kubectl apply -f $PSScriptRoot/yaml/ns/mq-broker-default.yaml # this TLS listener has SAN DNS and IP settings for cross namespace hostname
+
+# Workaround not used for now, using the 0.0.0.0 IP in brokerlistener used above
+# # Update the brokerlistener after creation to include the LoadBalancer IP into the IP array of san/dns setting
+# $brokerListenerIp = kubectl get svc aio-mq-dmqtt-frontend -n azure-iot-operations -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+# $contentsBrokerListener = (Get-Content $PSScriptRoot/yaml/ns/mq-broker-listenerupdate.yaml) -Replace '__{IP_TO_BE_REPLACED}__', $brokerListenerIp
+# $contentsBrokerListener | kubectl apply -n azure-iot-ooerations -f -
 
 # Deploy OPC UA Broker with Helm 
 Write-Host "Deploying OPC UA components"
 
-# Full URI aio-mq-dmqtt-frontend.azure-iot-operations.svc.cluster.local, currently omitting due to TLS DNS entry only without namespace
 helm upgrade -i opcuabroker oci://mcr.microsoft.com/azureiotoperations/opcuabroker/helmchart/microsoft.iotoperations.opcuabroker `
     --set image.registry=mcr.microsoft.com     `
     --version 0.1.0-preview    `
@@ -73,7 +92,7 @@ helm upgrade -i opcuabroker oci://mcr.microsoft.com/azureiotoperations/opcuabrok
     --set secrets.kind=k8s     `
     --set secrets.csiServicePrincipalSecretRef=aio-akv-sp `
     --set secrets.csiDriver=secrets-store.csi.k8s.io `
-    --set mqttBroker.address=mqtts://aio-mq-dmqtt-frontend:8883     `
+    --set mqttBroker.address=mqtts://aio-mq-dmqtt-frontend.azure-iot-operations.svc.cluster.local:8883     `
     --set mqttBroker.authenticationMethod=serviceAccountToken `
     --set mqttBroker.serviceAccountTokenAudience=aio-mq     `
     --set mqttBroker.caCertConfigMapRef='aio-ca-trust-bundle-test-only'     `
@@ -82,7 +101,6 @@ helm upgrade -i opcuabroker oci://mcr.microsoft.com/azureiotoperations/opcuabrok
     --set opcPlcSimulation.deploy=true     `
     --wait
 
-# TODO upgrade Helm chart to Preview or change to usage of CR create via Yaml (AssetEndpointProfile)
 helm upgrade -i aio-opcplc-connector oci://mcr.microsoft.com/opcuabroker/helmchart/aio-opc-opcua-connector `
     --version 0.1.0-preview.6 `
     --namespace azure-iot-operations `
