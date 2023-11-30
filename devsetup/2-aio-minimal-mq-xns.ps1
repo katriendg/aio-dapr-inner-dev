@@ -75,12 +75,6 @@ Write-Host "Deploying MQTT Broker and TLS enabled Listener, and non-TLS Listener
 kubectl apply -f $PSScriptRoot/yaml/ns/mq-cert-issuer.yaml
 kubectl apply -f $PSScriptRoot/yaml/ns/mq-broker-default.yaml # this TLS listener has SAN DNS and IP settings for cross namespace hostname
 
-# Workaround not used for now, using the 0.0.0.0 IP in brokerlistener used above
-# # Update the brokerlistener after creation to include the LoadBalancer IP into the IP array of san/dns setting
-# $brokerListenerIp = kubectl get svc aio-mq-dmqtt-frontend -n azure-iot-operations -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
-# $contentsBrokerListener = (Get-Content $PSScriptRoot/yaml/ns/mq-broker-listenerupdate.yaml) -Replace '__{IP_TO_BE_REPLACED}__', $brokerListenerIp
-# $contentsBrokerListener | kubectl apply -n azure-iot-ooerations -f -
-
 # Deploy OPC UA Broker with Helm 
 Write-Host "Deploying OPC UA components"
 

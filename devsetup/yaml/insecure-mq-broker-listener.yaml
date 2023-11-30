@@ -14,7 +14,7 @@ spec:
     tag: 0.1.0-preview
   healthManagerImage:
     pullPolicy: Always
-    repository: alicesprings.azurecr.io/dmqtt-operator
+    repository: mcr.microsoft.com/azureiotoperations/dmqtt-operator
     tag: 0.1.0-preview
   memoryProfile: medium
   mode: distributed

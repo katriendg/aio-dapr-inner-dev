@@ -14,7 +14,7 @@ spec:
     tag: 0.1.0-preview
   healthManagerImage:
     pullPolicy: Always
-    repository: alicesprings.azurecr.io/dmqtt-operator
+    repository: mcr.microsoft.com/azureiotoperations/dmqtt-operator
     tag: 0.1.0-preview
   memoryProfile: medium
   mode: distributed
@@ -70,8 +70,7 @@ spec:
         dns:
         - aio-mq-dmqtt-frontend.azure-iot-operations.svc.cluster.local
         - aio-mq-dmqtt-frontend.azure-iot-operations
-        ip:
-        - 0.0.0.0
+        ip: [] # empty array for now as IP is still a required field when setting `san`
 ---
 apiVersion: mq.iotoperations.azure.com/v1beta1
 kind: BrokerListener

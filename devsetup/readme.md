@@ -1,6 +1,6 @@
 # AIO - Deployment Options in Developer Environment
 
-The normal developer setup for this sample with AIO deployment follows a full AIO deployment as documented on the root [Readme](../README.md). Start there if you have not yet reviewed the document. For development purposes we also share a few different options to deploy AIO components in a more controlled and separated way.
+The normal developer setup for this sample with AIO deployment follows a full AIO deployment as documented on the root [Readme](../README.md). Start there if you have not yet reviewed the document. For development purposes we also share a few different options to deploy AIO components in more customized ways.
 
 ## Sample 1: Deploying AIO Components: MQ, OPC Broker and Sample Asset
 
@@ -156,3 +156,106 @@ aio-opc-opc.tcp-1-cb6944bdf-27vx9               2/2     Running   0          2m1
 
 - Once deployment is complete, open a new Terminal and run `mqttui` to watch messages from the OPC UA broker flow through to the MQTT broker. You should see messages under the topic `azure-iot-operations/data/opc.tcp/opc.tcp-1/thermostat-sample`.
 - This concludes the setup of Sample 2.
+
+## Sample 3: Minimal MQ and OPC UA Deployment with Cross Namespace DNS in TLS Certificate for MQ
+
+This sample aims to deploy and configure AIO with TLS, two components (MQ and OPC UA Broker), focusing on a sample to connect to MQ broker from within the Kubernetes cluster in another namespace (non `azure-iot-operations`). It leverages a sample MQTT client as a Pod deployed to the `default` namespace to show this.
+
+The default deployment option with `az iot init ... --no-deploy` takes care of deploying Azure Key Vault and related components, and it also creates a self-signed CA certificate and key on disk. These files are loaded into the Kubernetes cluster as a secret, and a ConfigMap named `aio-ca-trust-bundle-test-only` is created to contain the public portion of the CA. This public portion is used by the client to trust the server certificate issued to the MQ broker.
+
+### Sample 3: Pre-requisites
+
+- Dev Container setup with the K3D cluster, without any Azure Arc or Azure IoT Operations components installed
+- `az login` has been executed and subscription set as default
+
+If required, simply reset your environment using the `[0-cleanup.ps1 script](./devsetup/0-cleanup.ps1)`. See the [Readme - Clean up environment](../README.md#clean-up-environment-and-reset-dev-container)
+
+### Sample 3: What will be deployed
+
+On Azure:
+
+- Azure Resource Group
+- Azure Arc Connected Kubernetes cluster
+- Azure Key Vault account
+- Azure IoT Operations Arc extension
+- AIO MQ Arc extension
+
+On the K3D cluster:
+
+- Azure Arc
+- Azure (Arc) Provider for Secrets Store CSI Driver
+- AIO base components (cert-manager, orchestrator, metrics)
+- AIO MQ component with a Broker, a TLS Listener without auth, a non-TLS Listener for development, Diagnostics service (note that MQ broker configuration includes a `SAN` section you can review [here](./yaml/ns/mq-broker-default.yaml))
+- OPC UA Broker, OPC UA Connector (AssetEndpointProfile), AssetType and Asset
+- Service Account `mqtt-client` will be created in namespace `azure-iot-operations` and `default`
+- [Reflector](https://github.com/emberstack/kubernetes-reflector) is used to sync the ConfigMap `aio-ca-trust-bundle-test-only` from `azure-iot-operations` namespace into the `default` namespace by annotating it, optionally one could manually copy the ConfigMap between namespaces
+
+### Sample 3: Deployment
+
+- In a PowerShell terminal run the following script to connect the cluster to Azure Arc.
+
+```powershell
+ 
+ ./devsetup/1-arc.ps1 -ClusterName arck-MY-CLUSTER -ResourceGroupName rg-MY-RG -Location northeurope
+
+```
+
+- In a PowerShell terminal run the following script, passing in the same Resource Group and ClusterName as used above, ensuring the Azure Key Vault named passed in will be unique enough:
+
+```powershell
+./devsetup/2-aio-minimal-mq-xns.ps1 -ClusterName arck-MY-CLUSTER -ResourceGroupName rg-MY-RG -KeyVaultName kv-MY-KEYVAULTNAME  -Location northeurope
+```
+
+- Take a moment to review what gets deployed by looking at the script [2-aio-minimal-mq-xns.ps1](./2-aio-minimal-mq-xns.ps1). Note the BrokerListener is created using a `CustomResource`, and review the `san` section in there. More information about this can be found in the official documentation [Configure automatic TLS](https://learn.microsoft.com/en-us/azure/iot-operations/manage-mqtt-connectivity/howto-configure-tls-auto?tabs=test#optional-configure-server-certificate-parameters).
+- Validate components are deployed by reviewing the pods. This can take a few minutes.
+- The current namespace context has been set to `azure-iot-operations` by the scripts.
+- Validate the TLS server certificate used by the MQ TLS based broker listener is reflecting the DNS entries for the service including the formatting `servicename.namespace`
+
+```powershell
+kubectl describe cert aio-mq-frontend-server-8883
+
+# check the section Dns Names:
+
+...
+Spec:
+  Common Name:  aio-mq-frontend-server-8883
+  Dns Names:
+    aio-mq-dmqtt-frontend
+    aio-mq-dmqtt-frontend.azure-iot-operations
+    aio-mq-dmqtt-frontend.azure-iot-operations.svc.cluster.local
+  Duration:  720h0m0s
+...
+
+```
+
+- Deploy the sample Pod that includes Mosquitto client to run a connection test within the Kubernetes cluster. This sample is based on the following official documentation: [Test connectivity to IoT MQ with MQTT clients](https://learn.microsoft.com/en-us/azure/iot-operations/manage-mqtt-connectivity/howto-test-connection#connect-from-a-pod-within-the-cluster-with-default-configuration).
+
+```powershell
+kubectl apply -f ./devsetup/yaml/ns/mqtt-client-pod.yaml  
+```
+
+- Review the contents of the YAML file to familiarize yourself with the mounted volumes. Validate the pod is running in the `default` namespace.
+
+```bash
+kubectl get pods -n default
+
+NAME          READY   STATUS    RESTARTS      AGE
+mqtt-client   1/1     Running   0            5m
+```
+
+- Open a new terminal and run `mqttui`, keep it running to watch subscribed topics.
+- Return to your main terminal.
+- Open interactive shell into the pod `mqtt-client`.
+
+```bash
+kubectl exec --stdin --tty mqtt-client -n default -- sh
+```
+
+- Publish a message to the MQ using the mounted self-signed CA certificate and the local DNS name to the `azure-iot-operations` namespace.
+
+```bash
+mosquitto_pub -h aio-mq-dmqtt-frontend.azure-iot-operations.svc.cluster.local -p 8883 -m "hello from pod" -t "defaultsample" -d --cafile /var/run/certs/ca.crt
+```
+
+- Validate the message is published to the `defaultsample` topic by switching to the `mqttui` running in the other terminal.
+- This concludes the setup of Sample 3.

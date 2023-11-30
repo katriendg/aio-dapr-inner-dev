@@ -106,7 +106,7 @@ There might however be cases when you do need to deploy new Pod configuration an
 
 After the application has been removed from the cluster simply rerun the scripts to build the Docker images and deploy to the cluster as described in the section Building, deploying and debugging the application above, and increase the `Version` parameter.
 
-## Clean-up environment and Reset Dev Container
+## Clean-up Environment and Reset Dev Container
 
 Whenever you want to start again with a new K3D registry, cluster, Azure Arc and AIO components in both Azure and local cluster, you can run the PowerShell script `devsetup/0-cleanup.ps1`.
 
@@ -115,6 +115,10 @@ Whenever you want to start again with a new K3D registry, cluster, Azure Arc and
 ```
 
 This deletes all Azure resources (resource group, Azure Arc, Key Vault). It also deletes the K3D container registry and cluster, and then re-creates the registry and K3D cluster once again.
+
+## Additional Deployment Samples
+
+This repo also contains some work in progress to deploy AIO components in a more customized way, leveraging `CustomResouceDefinition` (CRD) based resources. You can review a few samples for development purposes shared in the document [AIO - Deployment Options in Developer Environment](./devsetup/readme.md).
 
 ## Option to Leverage this Sample without Dev Container
 
