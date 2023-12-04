@@ -1,0 +1,29 @@
+apiVersion: deviceregistry.microsoft.com/v1beta1
+kind: Asset
+metadata:
+  name: avr-asset
+  namespace: azure-iot-operations
+  labels:
+    com.azure.iotoperations.opcuabroker/validation-scope: v1beta1
+spec:
+  displayName: Subscription of Assets from avr
+  description: Asset that configure OPC UA Broker to listen to tags
+  assetEndpointProfileUri: aio-opcplc-connector
+  defaultDataPointsConfiguration: |-
+    {
+      "publishingInterval": 1000,
+      "samplingInterval": 1000
+    }    
+  dataPoints:
+  - dataSource: nsu=http://microsoft.com/Opc/OpcPlc/;s=FastUInt2
+    observabilityMode: log
+    dataPointConfiguration: |-
+      {
+        "samplingInterval": 1000
+      }
+  - dataSource: nsu=http://microsoft.com/Opc/OpcPlc/;s=FastUInt1
+    observabilityMode: log
+    dataPointConfiguration: |-
+      {
+        "samplingInterval": 1000
+      }

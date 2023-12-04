@@ -1,0 +1,33 @@
+# Based on docs - https://learn.microsoft.com/en-us/azure/iot-operations/manage-mqtt-connectivity/howto-test-connection
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mqtt-client
+  # Namespace must match IoT MQ BrokerListener's namespace by default, but changing for this test
+  namespace: default
+spec:
+  # Use the "mqtt-client" service account, needs to exist in the namespace
+  serviceAccountName: mqtt-client
+  containers:
+    # Mosquitto and mqttui on Alpine
+  - image: alpine
+    name: mqtt-client
+    command: ["sh", "-c"]
+    args: ["apk add mosquitto-clients mqttui && sleep infinity"]
+    volumeMounts:
+    - name: mq-sat
+      mountPath: /var/run/secrets/tokens
+    - name: trust-bundle
+      mountPath: /var/run/certs
+  volumes:
+  - name: mq-sat
+    projected:
+      sources:
+      - serviceAccountToken:
+          path: mq-sat
+          audience: aio-mq # Must match audience in BrokerAuthentication
+          expirationSeconds: 86400
+  - name: trust-bundle
+    configMap:
+      # Configmap must exist in the same namespace as the pod
+      name: aio-ca-trust-bundle-test-only # Default root CA cert
