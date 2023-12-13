@@ -18,7 +18,7 @@ Open this project in Visual Studio Code dev container:
 
 - Open the Command palette
 - Choose the option `Dev Containers: Reopen in container`
-- Once the image has been initialized, the dev container will have initialized K3D Kubernetes cluster with a local container registry for development purposes. This is now ready for initializing Azure IoT Operations and Azure Arc. The container registry is available inside the devcontainer and inside the K3D cluster under the name `k3d-devregistry.localhost:5500`.
+- Once the image has been initialized, the dev container will have initialized K3D Kubernetes cluster with a local container registry for development purposes, and Dapr pre-installed. This is now ready for initializing Azure IoT Operations and Azure Arc. The container registry is available inside the devcontainer and inside the K3D cluster under the name `k3d-devregistry.localhost:5500`.
 
 ### Connect to Azure Arc
 
@@ -58,7 +58,7 @@ This is a one-time setup and you are now ready to develop your custom modules an
 
 ## Debugging C# Sample PubSub with Dapr Pluggable Component to AIO MQTT
 
-The sample application found under `/src/csharp/SamplePubSub/` is a .NET application that leverages Dapr for PubSub with AIO's MQ service to subscribe and publish messages. You can debug this application within the  environment by leveraging [VS Code Kubernetes Tools - Debugging](https://github.com/vscode-kubernetes-tools/vscode-kubernetes-tools/blob/master/debug-on-kubernetes.md), which is already pre-installed and configured within the Dev Container.
+The sample application found in the folder `/src/csharp/SamplePubSub/` is a .NET application that leverages Dapr for PubSub with AIO's MQ service to subscribe and publish messages. You can debug this application within the  environment by leveraging [VS Code Kubernetes Tools - Debugging](https://github.com/vscode-kubernetes-tools/vscode-kubernetes-tools/blob/master/debug-on-kubernetes.md), which is already pre-installed and configured within the Dev Container.
 
 The Dockerfile used to build the container image for the pod is configured to include the required [debugging tools](https://github.com/vscode-kubernetes-tools/vscode-kubernetes-tools/blob/master/debug-on-kubernetes.md#6-dotnet-debugging). The `dev.Dockerfile` for development and debugging purposes can be reviewed here: [dev.Dockerfile](./src/csharp/SamplePubSub/dev.Dockerfile).
 
@@ -119,7 +119,7 @@ To remove the pod deployment completely from the Kubernetes cluster you can run 
 
 ## Clean-up Environment and Reset Dev Container
 
-Whenever you want to start again with a new K3D registry, cluster, Azure Arc and AIO components in both Azure and local cluster, you can run the PowerShell script `devsetup/0-cleanup.ps1`.
+Whenever you want to start again with a new K3D registry, K3D cluster, Dapr installed on cluster, Azure Arc and AIO components in both Azure and local cluster, you can run the PowerShell script `devsetup/0-cleanup.ps1`.
 
 ```powershell
 ./devsetup/0-cleanup.ps1 -ResourceGroupName rg-MY-RG

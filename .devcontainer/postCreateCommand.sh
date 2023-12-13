@@ -32,10 +32,11 @@ else
     -p '8883:8883@loadbalancer' \
     -p '6001:6001@loadbalancer' \
     -p '4000:80@loadbalancer'
-fi
 
-helm repo add dapr https://dapr.github.io/helm-charts/
-helm repo update
-helm upgrade --install dapr dapr/dapr --version=1.11 --namespace dapr-system --create-namespace --wait
+    # Install Dapr on cluster    
+    helm repo add dapr https://dapr.github.io/helm-charts/
+    helm repo update
+    helm upgrade --install dapr dapr/dapr --version=1.11 --namespace dapr-system --create-namespace --wait
+fi
 
 echo "Ending Post Create Command"
