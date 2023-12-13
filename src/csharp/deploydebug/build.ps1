@@ -10,7 +10,7 @@ param (
     [string]$ContainerRegistry = "k3d-devregistry.localhost:5500"
 )
 
-docker build $PSScriptRoot/../SamplePubSub/. -f $PSScriptRoot/../SamplePubSub/Dockerfile -t samplepubsub:$Version
+docker build $PSScriptRoot/../SamplePubSub/. -f $PSScriptRoot/../SamplePubSub/dev.Dockerfile -t samplepubsub:$Version
 
 docker tag samplepubsub:$Version $ContainerRegistry/samplepubsub:$Version
 

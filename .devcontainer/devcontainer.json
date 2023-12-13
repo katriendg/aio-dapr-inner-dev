@@ -51,8 +51,7 @@
 				"ms-azuretools.vscode-dapr",
 				"ms-kubernetes-tools.vscode-kubernetes-tools",
 				"EditorConfig.EditorConfig",
-				"ms-vscode.powershell",
-				"mindaro.mindaro" //bridge to kubernetes
+				"ms-vscode.powershell"
 			]
 		}
 	}
