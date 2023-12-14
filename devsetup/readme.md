@@ -9,7 +9,7 @@ The normal developer setup for this sample with AIO deployment follows a full AI
 - Dev Container setup with the K3D cluster, without any Azure Arc or Azure IoT Operations components installed
 - `az login` has been executed and subscription set as default
 
-If required, simply reset your environment using the `[0-cleanup.ps1 script](./devsetup/0-cleanup.ps1)`. See the [Readme - Clean up environment](../README.md#clean-up-environment-and-reset-dev-container)
+If required, simply reset your environment using the [0-cleanup.ps1 script](./devsetup/0-cleanup.ps1). See the [Readme - Clean up environment](../README.md#clean-up-environment-and-reset-dev-container)
 
 ### Sample 1: What will be deployed
 

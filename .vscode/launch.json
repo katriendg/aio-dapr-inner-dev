@@ -5,20 +5,26 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "C#: SamplePubSub Local Debug with Kubernetes",
-            "type": "dotnet",
-            "request": "launch",
-            "projectPath": "${workspaceFolder}/src/csharp/SamplePubSub/SamplePubSub.csproj",
-            "preLaunchTask": "bridge-to-kubernetes.resource",
-            "env": {
-                "GRPC_DNS_RESOLVER": "native"
-            }
-        },
-        {
             "name": "C#: SamplePubSub Local Debug",
             "type": "dotnet",
             "request": "launch",
             "projectPath": "${workspaceFolder}/src/csharp/SamplePubSub/SamplePubSub.csproj"
-        }
+        },
+        {
+            "name": ".NET Debug Pod (Attach)",
+            "type": "coreclr",
+            "request": "attach",
+            "processId": 1,
+            "pipeTransport": {
+                "pipeProgram": "kubectl",
+                "pipeArgs": [ "exec", "-i", "${command:extension.vsKubernetesSelectPod}", "--" ],
+                "pipeCwd": "${workspaceRoot}",
+                "debuggerPath": "/root/vsdbg/vsdbg",
+                "quoteArgs": false
+            },
+            "sourceFileMap": {
+                "/src": "${workspaceFolder}/src/csharp/SamplePubSub"
+              }
+          }
     ]
 }

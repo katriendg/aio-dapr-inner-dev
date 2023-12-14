@@ -20,7 +20,7 @@ Param(
 
 Write-Host "Pre-requisite - Key Vault"
 
-az keyvault create -n $KeyVaultName -g $ResourceGroupName -o tsv --query id
+az keyvault create -n $KeyVaultName -g $ResourceGroupName --enable-rbac-authorization false
 
 $keyVaultResourceId = $(az keyvault show -n $KeyVaultName -g $ResourceGroupName -o tsv --query id)
 
