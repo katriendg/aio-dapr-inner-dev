@@ -82,7 +82,7 @@ Several scripts allow you to automate the process, all of which can be found in 
     - Deploy the Pod, Dapr Component and Service to the cluster by running the following script. Note that the `Version` matches an existing image tag that you have built before. The deployment will use the namespace `azure-iot-operations` by default as this is currently ensuring the application is in the same namespace as AIO components.
 
     ```powershell
-     `./src/csharp/deploydebug/deploy.ps1 -Version 0.1`
+    ./src/csharp/deploydebug/deploy.ps1 -Version 0.1
     ```
 
     - Validate the pod is running:
