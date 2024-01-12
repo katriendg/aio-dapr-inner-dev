@@ -28,7 +28,8 @@ spec:
       workers: 2
   encryptInternalTraffic: false
   diagnostics:
-    diagnosticServiceEndpoint: mq-instance-diagnostics-service.azure-iot-operations:9700
+    diagnosticServiceEndpoint: mq-instance-diagnostics-service:9700
+    probeImage: mcr.microsoft.com/azureiotoperations/diagnostics-probe:0.1.0-preview
     enableMetrics: true  
     enableTracing: true
     enableSelfCheck: true
