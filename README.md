@@ -1,10 +1,14 @@
 # Azure IoT Operations Inner Developer Loop - Sample with Dapr
 
-> Note: [Azure IoT Operations](https://learn.microsoft.com/en-us/azure/iot-operations/) is currently in PREVIEW and subject to change. This sample might stop working at any time due to changes in the PREVIEW.
+> [!IMPORTANT]
+> Please note the main corpus of this demo has moved to a shared repo: [https://github.com/Azure-Samples/azure-edge-extensions-aio-dapr-net-devcontainer-k3d](https://github.com/Azure-Samples/azure-edge-extensions-aio-dapr-net-devcontainer-k3d). This personal repo is currently kept for some additional deployment experiments of AIO components found under the [./devsetup](./devsetup/) folder, but the generic inner dev loop will no longer be updated here.
 
 This sample contains the setup of an inner developer loop to work with Azure IoT Operations and custom applications using Dapr and .NET.
 The repo is using a configuration with Visual Studio Code, Dev Container and VS Code Kubernetes Tools to allow local developer environment configuration and remote debugging of workloads.
 The sample workload is using .NET, though the same debugging experience can be achieved with other languages.
+
+> [!WARNING]
+> [Azure IoT Operations](https://learn.microsoft.com/en-us/azure/iot-operations/) is currently in PREVIEW and subject to change. This sample might stop working at any time due to changes in the PREVIEW.
 
 ## Prerequisites
 
